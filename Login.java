@@ -5,6 +5,11 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,12 +21,13 @@ import javax.swing.JButton;
 
 public class Login implements ActionListener 
 {
-	JButton b;
+	JButton b,b1;
 	JTextField t;
+	JFrame f;
 	JPasswordField t1;
 	void demo()
 	{
-		JFrame f=new JFrame("My Project");
+		f=new JFrame("My Project");
 		f.setSize(1600, 900);
 		f.setLayout(null);
 		f.getContentPane().setBackground(Color.decode("#FFDEAD"));
@@ -64,6 +70,13 @@ public class Login implements ActionListener
 		b.setForeground(Color.decode("#2E8B57"));
 		f.add(b);
 		b.addActionListener(this);
+		
+		b1=new JButton("Register");
+		b1.setBounds(540, 460, 300, 50);
+		b1.setFont(new Font("Viner Hand ITC",Font.BOLD,40));
+		b1.setForeground(Color.decode("#2E8B57"));
+		f.add(b1);
+		b1.addActionListener(this);
 	}
 	public static void main(String[] args)
 	{
@@ -80,14 +93,42 @@ public class Login implements ActionListener
 			{
 				JOptionPane.showMessageDialog(b, "Please enter all data");
 			}
-			else if(s.equals("Java") && s1.equals("12345"))
+			else 
 			{
-			JOptionPane.showMessageDialog(b, "Login Success");
+				String url="jdbc:mysql://localhost/first_class";
+				String user="root";
+				String pass="kokilajana";
+				try {
+					Connection con=DriverManager.getConnection(url, user, pass);
+					String Query="select * from login where name=? and pass=?";
+					PreparedStatement ps=con.prepareStatement(Query);
+					ps.setString(1, s);
+					ps.setString(2, s1);
+					ResultSet rs=ps.executeQuery();
+					if(rs.next())
+					{
+						JOptionPane.showMessageDialog(b, "Login Success");
+						new Next();
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(b, "Invalid username or password...");
+					}
+					
+					
+					
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 			}
-			else
-			{
-				JOptionPane.showMessageDialog(b, "Invalid username or password..");
-			}
+		}
+		else if(e.getSource()==b1)
+		{
+			Register r=new Register();
+			r.fun();
+			f.setVisible(false);
 		}
 	}
 }
